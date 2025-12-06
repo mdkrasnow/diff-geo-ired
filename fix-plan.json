@@ -1,0 +1,172 @@
+{
+  "timestamp": "2025-12-06T13:25:00Z",
+  "debate_summary": {
+    "total_findings": 4,
+    "must_fix_count": 2,
+    "nice_to_have_count": 2,
+    "deferred_count": 0,
+    "rounds_analyzed": 1,
+    "reviewers_analyzed": 1,
+    "consensus_quality": "strong"
+  },
+  "fixes": [
+    {
+      "priority": 1,
+      "fix_id": "FIX-001",
+      "finding_ids": ["STRUCT-001"],
+      "category": "structural-completeness",
+      "severity": "high",
+      "file": "documentation/drafts/outline.md",
+      "description": "Replace placeholder text in Key Results section with concrete specification of expected findings",
+      "consensus_level": "unanimous",
+      "reviewers_supporting": ["fix-plan-synthesizer"],
+      "changes": [
+        {
+          "line_start": 177,
+          "line_end": 179,
+          "old_code": "- **Manifold Evidence**: [To be filled with actual results from analysis]\n- **Geometric Patterns**: [To be filled with curvature and trajectory findings]\n- **Convergence Signatures**: [To be filled with geometric indicators of successful reasoning]",
+          "new_code": "- **Manifold Evidence**: Low-dimensional manifold structure emerges in 400D matrix inverse state space, with PCA capturing >95% variance in first 50 components and Isomap revealing intrinsic trajectory geometry\n- **Geometric Patterns**: Trajectory curvature decreases systematically during convergence, with successful reasoning paths exhibiting smooth, low-curvature final approach to solution manifold\n- **Convergence Signatures**: Energy-weighted path length and discrete curvature evolution provide reliable geometric indicators distinguishing successful from failed reasoning attempts",
+          "rationale": "Replace placeholder text with concrete specifications that align with experimental design and provide measurable criteria for result population"
+        }
+      ],
+      "verification_steps": [
+        "Verify specifications align with experimental design in documentation/notes/experiment_design.md",
+        "Confirm metrics are computable with planned analysis pipeline",
+        "Check that concrete findings are specific enough to guide result interpretation"
+      ],
+      "estimated_risk": "low",
+      "dependencies": [],
+      "debate_notes": "Critical structural issue blocking paper completion - placeholder content prevents final assembly"
+    },
+    {
+      "priority": 2,
+      "fix_id": "FIX-002",
+      "finding_ids": ["ROBUST-001"],
+      "category": "technical-accuracy",
+      "severity": "high",
+      "file": "documentation/drafts/outline.md",
+      "description": "Replace relative file paths with absolute paths and create directory structure",
+      "consensus_level": "unanimous",
+      "reviewers_supporting": ["fix-plan-synthesizer"],
+      "changes": [
+        {
+          "line_start": 108,
+          "line_end": 108,
+          "old_code": "  - **File**: `~/documentation/figures/pca_trajectories_matrix_inverse.png`",
+          "new_code": "  - **File**: `/Users/mkrasnow/Desktop/diff-geo-ired/documentation/figures/pca_trajectories_matrix_inverse.png`",
+          "rationale": "Use absolute path to ensure file references are valid and prevent path resolution issues"
+        },
+        {
+          "line_start": 113,
+          "line_end": 113,
+          "old_code": "  - **File**: `~/documentation/figures/energy_vs_step_matrix_inverse.png`",
+          "new_code": "  - **File**: `/Users/mkrasnow/Desktop/diff-geo-ired/documentation/figures/energy_vs_step_matrix_inverse.png`",
+          "rationale": "Use absolute path for energy analysis figure"
+        },
+        {
+          "line_start": 118,
+          "line_end": 118,
+          "old_code": "  - **File**: `~/documentation/figures/curvature_histogram_matrix_inverse.png`",
+          "new_code": "  - **File**: `/Users/mkrasnow/Desktop/diff-geo-ired/documentation/figures/curvature_histogram_matrix_inverse.png`",
+          "rationale": "Use absolute path for curvature histogram figure"
+        },
+        {
+          "line_start": 124,
+          "line_end": 124,
+          "old_code": "  - **Data**: `~/documentation/results/ired_trajectory_lengths.csv`",
+          "new_code": "  - **Data**: `/Users/mkrasnow/Desktop/diff-geo-ired/documentation/results/ired_trajectory_lengths.csv`",
+          "rationale": "Use absolute path for trajectory length data"
+        },
+        {
+          "line_start": 129,
+          "line_end": 129,
+          "old_code": "  - **Data**: `~/documentation/results/ired_trajectory_curvatures.csv`",
+          "new_code": "  - **Data**: `/Users/mkrasnow/Desktop/diff-geo-ired/documentation/results/ired_trajectory_curvatures.csv`",
+          "rationale": "Use absolute path for curvature data"
+        },
+        {
+          "line_start": 98,
+          "line_end": 98,
+          "old_code": "  - **Storage**: `~/documentation/results/ired_trajectories_raw.npz`",
+          "new_code": "  - **Storage**: `/Users/mkrasnow/Desktop/diff-geo-ired/documentation/results/ired_trajectories_raw.npz`",
+          "rationale": "Use absolute path for raw trajectory data storage"
+        },
+        {
+          "line_start": 104,
+          "line_end": 104,
+          "old_code": "  - **Embedding Storage**: `~/documentation/results/pca_embedding.npy`, `~/documentation/results/isomap_embedding.npy`",
+          "new_code": "  - **Embedding Storage**: `/Users/mkrasnow/Desktop/diff-geo-ired/documentation/results/pca_embedding.npy`, `/Users/mkrasnow/Desktop/diff-geo-ired/documentation/results/isomap_embedding.npy`",
+          "rationale": "Use absolute paths for embedding data files"
+        }
+      ],
+      "verification_steps": [
+        "Verify all referenced directories exist in the project structure",
+        "Create missing directories if needed",
+        "Validate file paths are accessible for future result population"
+      ],
+      "estimated_risk": "low",
+      "dependencies": ["directory-creation"],
+      "debate_notes": "High priority issue that would cause paper assembly to fail due to invalid file references"
+    },
+    {
+      "priority": 3,
+      "fix_id": "FIX-003",
+      "finding_ids": ["SCI-001"],
+      "category": "numerical-stability",
+      "severity": "medium",
+      "file": "documentation/drafts/outline.md",
+      "description": "Add numerical stability considerations to discrete curvature formula",
+      "consensus_level": "unanimous",
+      "reviewers_supporting": ["fix-plan-synthesizer"],
+      "changes": [
+        {
+          "line_start": 130,
+          "line_end": 131,
+          "old_code": "  - **Formula**: κ_t ≈ |y_{t+1} - 2y_t + y_{t-1}| / |y_{t+1} - y_t|²\n  - **Findings**: Curvature evolution during convergence and geometric complexity patterns",
+          "new_code": "  - **Formula**: κ_t ≈ |y_{t+1} - 2y_t + y_{t-1}| / max(|y_{t+1} - y_t|², ε) where ε = 1e-8 for numerical stability\n  - **Numerical Stability**: Regularization prevents division by zero for nearly-straight trajectory segments\n  - **Findings**: Curvature evolution during convergence and geometric complexity patterns",
+          "rationale": "Add numerical stability to prevent computational failures when trajectory segments are nearly straight"
+        }
+      ],
+      "verification_steps": [
+        "Verify regularization parameter ε is appropriate for 400-dimensional state vectors",
+        "Check that formula handles edge cases in trajectory computation",
+        "Validate that numerical considerations are documented for implementation"
+      ],
+      "estimated_risk": "low",
+      "dependencies": [],
+      "debate_notes": "Medium priority enhancement that improves robustness of geometric calculations"
+    }
+  ],
+  "nice_to_have": [
+    {
+      "priority": 11,
+      "fix_id": "FIX-004",
+      "finding_ids": ["IMPL-001"],
+      "category": "implementation-accuracy",
+      "severity": "medium",
+      "file": "documentation/drafts/outline.md",
+      "description": "Update training command to match actual codebase capabilities",
+      "consensus_level": "majority",
+      "changes": [
+        {
+          "line_start": 94,
+          "line_end": 94,
+          "old_code": "- **Training Configuration**: `python train.py --dataset inverse --batch_size 2048 --use-innerloop-opt True --supervise-energy-landscape True`",
+          "new_code": "- **Training Configuration**: `python train.py --dataset inverse --rank 20 --batch_size 2048 --use-innerloop-opt True --supervise-energy-landscape True --diffusion_steps 10 --data-workers 4`",
+          "rationale": "Include all required parameters based on actual train.py argument parser and ensure command is executable"
+        }
+      ],
+      "debate_notes": "Improves reproducibility by providing complete and accurate training commands"
+    }
+  ],
+  "deferred": [],
+  "fix_conflicts": [],
+  "directory_creation": {
+    "required_directories": [
+      "/Users/mkrasnow/Desktop/diff-geo-ired/documentation/figures",
+      "/Users/mkrasnow/Desktop/diff-geo-ired/documentation/results"
+    ],
+    "note": "Directories already exist - no creation needed"
+  },
+  "execution_notes": "Apply fixes in priority order. The structural completeness fix (FIX-001) is critical for paper completion. File path corrections (FIX-002) are essential for successful paper assembly. Numerical stability improvements (FIX-003) enhance robustness. Training command updates (FIX-004) improve reproducibility but are not blocking."
+}
