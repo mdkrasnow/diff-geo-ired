@@ -98,17 +98,28 @@ class LowRankDataset(data.Dataset):
 
 
 class Inverse(data.Dataset):
-    def __init__(self, dataset_size=1000, h=100, w=100, ood=False):
+    def __init__(self, dataset_size=1000, h=100, w=100, ood=False, log_trajectories=False):
         """
         Generate dataset of rank-h matrix completion problems
 
         :param dataset_size: Number of examples to generate
         :param h: Dimension of the matrix (hxh)
+        :param log_trajectories: Enable trajectory logging for IRED research pipeline
         """
         self.dataset_size = dataset_size
         self.h = h
         self.w = w if w != h else h
         self.ood = ood
+        self.log_trajectories = log_trajectories
+        
+        # Initialize trajectory logging storage
+        if self.log_trajectories:
+            self.trajectory_log = {
+                'matrix_states': [],
+                'conditioning_info': [],
+                'inversion_steps': [],
+                'timestamps': []
+            }
 
     def __getitem__(self, index):
         """
@@ -118,6 +129,10 @@ class Inverse(data.Dataset):
         x - the full matrix of size h x h
         A_paths(str) - - the path of the image
         """
+        import time
+        
+        # Log trajectory start time if logging enabled
+        start_time = time.time() if self.log_trajectories else None
 
         R_corrupt = np.random.uniform(-1, 1, (self.h, self.w)).astype(np.float32)
         R_corrupt = R_corrupt.dot(R_corrupt.transpose())
@@ -133,6 +148,7 @@ class Inverse(data.Dataset):
         
         # Validate matrix conditioning before inversion
         condition_number = np.linalg.cond(R_corrupt)
+        extra_reg = 0
         if condition_number > 1e12:
             # Add extra regularization for ill-conditioned matrices
             extra_reg = 1e-6
@@ -140,6 +156,20 @@ class Inverse(data.Dataset):
             condition_number = np.linalg.cond(R_corrupt)
             if condition_number > 1e12:
                 raise ValueError(f"Matrix ill-conditioned: cond={condition_number:.2e}, regularization failed")
+        
+        # Log matrix state and conditioning info if enabled
+        if self.log_trajectories:
+            self.trajectory_log['matrix_states'].append({
+                'index': index,
+                'initial_matrix': R_corrupt.copy(),
+                'matrix_shape': (self.h, self.w),
+                'ood_mode': self.ood
+            })
+            self.trajectory_log['conditioning_info'].append({
+                'condition_number': float(condition_number),
+                'regularization': float(regularization),
+                'extra_regularization': float(extra_reg)
+            })
         
         # Compute inverse with float64 precision, validate result
         try:
@@ -160,12 +190,103 @@ class Inverse(data.Dataset):
         except np.linalg.LinAlgError as e:
             raise ValueError(f"Matrix inversion failed: {e}")
 
+        # Log inversion steps and timing if enabled
+        if self.log_trajectories:
+            end_time = time.time()
+            self.trajectory_log['inversion_steps'].append({
+                'float64_precision_used': True,
+                'float32_validation_passed': identity_check_f32,
+                'float64_validation_passed': identity_check,
+                'inverse_matrix': R.copy()
+            })
+            self.trajectory_log['timestamps'].append({
+                'start_time': start_time,
+                'end_time': end_time,
+                'duration': end_time - start_time
+            })
+
         return R_corrupt.flatten(), R.flatten()
 
     def __len__(self):
         """Return the total number of images in the dataset."""
         # Dataset is always randomly generated
         return int(1e7)
+    
+    def get_trajectory_log(self):
+        """
+        Retrieve the complete trajectory log for IRED research analysis.
+        
+        Returns:
+            dict: Complete trajectory log with matrix states, conditioning info, 
+                  inversion steps, and timestamps
+        """
+        if not self.log_trajectories:
+            raise ValueError("Trajectory logging not enabled. Set log_trajectories=True in constructor.")
+        return self.trajectory_log
+    
+    def get_trajectory_summary(self):
+        """
+        Get summary statistics of logged trajectories for IRED research pipeline.
+        
+        Returns:
+            dict: Summary statistics including trajectory counts, timing info, 
+                  conditioning statistics
+        """
+        if not self.log_trajectories:
+            raise ValueError("Trajectory logging not enabled. Set log_trajectories=True in constructor.")
+        
+        if not self.trajectory_log['timestamps']:
+            return {"summary": "No trajectories logged yet"}
+        
+        durations = [t['duration'] for t in self.trajectory_log['timestamps']]
+        condition_numbers = [c['condition_number'] for c in self.trajectory_log['conditioning_info']]
+        
+        return {
+            'total_trajectories': len(self.trajectory_log['timestamps']),
+            'timing_stats': {
+                'mean_duration': np.mean(durations),
+                'std_duration': np.std(durations),
+                'min_duration': np.min(durations),
+                'max_duration': np.max(durations)
+            },
+            'conditioning_stats': {
+                'mean_condition_number': np.mean(condition_numbers),
+                'std_condition_number': np.std(condition_numbers),
+                'min_condition_number': np.min(condition_numbers),
+                'max_condition_number': np.max(condition_numbers)
+            },
+            'matrix_dimensions': (self.h, self.w),
+            'ood_mode': self.ood
+        }
+    
+    def clear_trajectory_log(self):
+        """
+        Clear all logged trajectories to free memory.
+        Useful for long-running IRED experiments.
+        """
+        if not self.log_trajectories:
+            raise ValueError("Trajectory logging not enabled. Set log_trajectories=True in constructor.")
+        
+        self.trajectory_log = {
+            'matrix_states': [],
+            'conditioning_info': [],
+            'inversion_steps': [],
+            'timestamps': []
+        }
+    
+    def save_trajectory_log(self, filepath):
+        """
+        Save trajectory log to file for IRED research analysis.
+        
+        Args:
+            filepath (str): Path to save the trajectory log
+        """
+        if not self.log_trajectories:
+            raise ValueError("Trajectory logging not enabled. Set log_trajectories=True in constructor.")
+        
+        import pickle
+        with open(filepath, 'wb') as f:
+            pickle.dump(self.trajectory_log, f)
 
 
 class Equation(data.Dataset):

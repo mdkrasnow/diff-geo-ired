@@ -42,6 +42,15 @@ This flow has several key geometric properties:
 2. **Orthogonality**: Flow lines intersect energy level sets perpendicularly
 3. **Convergence**: Trajectories terminate at critical points (solutions)
 
+**Important Limitations in Discrete Case:**
+The discrete IRED updates may violate these continuous properties:
+- **Discrete Energy Monitoring**: Energy dissipation `E_{t+1} ≤ E_t` not guaranteed due to finite step sizes
+- **Step Size Dependencies**: Large step sizes `α` can cause energy increases and overshooting
+- **Landscape Transitions**: Rapid changes in `k_t` may disrupt monotonic energy decrease
+- **Numerical Precision**: Accumulated floating-point errors affect long trajectories
+
+These limitations require careful monitoring of energy values during optimization and adaptive step size control to maintain stability.
+
 ## Case Study: Matrix Inverse Problems
 
 ### Problem Formulation and Geometric Structure
@@ -190,19 +199,49 @@ def discrete_curvature(p_prev, p_curr, p_next):
 For three points forming a triangle, the Menger curvature provides a robust discrete approximation:
 
 ```python
-def menger_curvature(p1, p2, p3):
-    """Compute Menger curvature of triangle formed by three points."""
+def menger_curvature(p1, p2, p3, epsilon=1e-12):
+    """Compute Menger curvature of triangle formed by three points.
+    
+    Args:
+        p1, p2, p3: Points forming the triangle
+        epsilon: Tolerance for collinearity detection
+        
+    Returns:
+        Menger curvature, or 0 if points are collinear
+        
+    Note:
+        Returns 0 for collinear points to avoid division by zero.
+        Validates triangle inequality before computation.
+    """
     # Compute side lengths
     a = np.linalg.norm(p2 - p3)
     b = np.linalg.norm(p1 - p3) 
     c = np.linalg.norm(p1 - p2)
     
+    # Check for degenerate cases
+    if a < epsilon or b < epsilon or c < epsilon:
+        return 0  # Degenerate triangle
+    
+    # Validate triangle inequality
+    if not (a + b > c and b + c > a and c + a > b):
+        return 0  # Invalid triangle
+    
     # Area using Heron's formula
     s = (a + b + c) / 2
-    area = np.sqrt(s * (s - a) * (s - b) * (s - c))
+    discriminant = s * (s - a) * (s - b) * (s - c)
+    
+    # Check for collinearity (area near zero)
+    if discriminant < epsilon**2:
+        return 0  # Collinear points
+    
+    area = np.sqrt(discriminant)
     
     # Menger curvature = 4 * area / (a * b * c)
-    return 4 * area / (a * b * c)
+    denominator = a * b * c
+    if denominator < epsilon:
+        return 0  # Avoid division by zero
+        
+    return 4 * area / denominator
 ```
 
 ### Path Length Metrics
@@ -288,4 +327,34 @@ All experimental results are stored in standardized formats within `~/documentat
 3. **Numerical Stability**: Condition number monitoring and regularization for matrix operations
 4. **Error Bounds**: Confidence intervals for all statistical measures
 
-This comprehensive methodology provides a rigorous framework for analyzing the differential geometric properties of IRED optimization trajectories, with specific focus on the matrix inverse case study as a mathematically well-founded testbed for developing and validating geometric analysis techniques.
+### Numerical Stability and Robustness Measures
+
+#### Energy Monitoring Protocol
+```python
+def validate_energy_trajectory(energies, tolerance=1e-6):
+    """Monitor energy dissipation with discrete approximation bounds."""
+    violations = []
+    for i in range(1, len(energies)):
+        energy_increase = energies[i] - energies[i-1]
+        if energy_increase > tolerance:
+            violations.append({
+                'step': i,
+                'energy_increase': energy_increase,
+                'relative_increase': energy_increase / abs(energies[i-1])
+            })
+    return violations
+```
+
+#### Geometric Stability Checks
+- **Collinearity Detection**: All curvature computations include epsilon-based safeguards
+- **Triangle Validity**: Geometric diagnostics validate triangle inequality before computation
+- **Numerical Precision**: Double precision arithmetic with overflow/underflow monitoring
+- **Convergence Criteria**: Multi-metric validation (energy, gradient norm, solution distance)
+
+#### Failure Mode Documentation
+1. **Curvature Computation**: Returns 0 for degenerate/collinear configurations
+2. **Energy Violations**: Logged but do not terminate computation (expected in discrete case)
+3. **Matrix Conditioning**: Regularization applied for near-singular configurations
+4. **Trajectory Smoothness**: Outlier detection for erratic optimization paths
+
+This comprehensive methodology provides a rigorous framework for analyzing the differential geometric properties of IRED optimization trajectories, with specific focus on the matrix inverse case study as a mathematically well-founded testbed for developing and validating geometric analysis techniques. The numerical safeguards ensure robust computation even in challenging geometric configurations.
