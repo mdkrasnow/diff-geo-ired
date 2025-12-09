@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1765125073 "/Users/mkrasnow/Desktop/diff-geo-ired/documentation/communication_paper/geometric_analysis_ired.tex" "geometric_analysis_ired.pdf" "geometric_analysis_ired" 1765125075 0
-  "/Users/mkrasnow/Desktop/diff-geo-ired/documentation/communication_paper/geometric_analysis_ired.tex" 1765125073 13833 fc572c8e4338ba860ab17c42d159a32b ""
+["pdflatex"] 1765227482 "/Users/mkrasnow/Desktop/diff-geo-ired/documentation/communication_paper/geometric_analysis_ired.tex" "geometric_analysis_ired.pdf" "geometric_analysis_ired" 1765227488 0
+  "/Users/mkrasnow/Desktop/diff-geo-ired/documentation/communication_paper/geometric_analysis_ired.tex" 1765227482 12808 425ecd268a9d4ee309f038e51809fe1a ""
   "/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/tfm/jknappen/ec/tcrm1095.tfm" 1136768653 1536 02c06700a42be0f5a28664c7273f82e7 ""
@@ -101,9 +101,9 @@
   "/usr/local/texlive/2023/texmf.cnf" 1678822455 577 1b2b1af17af2508fb20dd85783af4050 ""
   "figures/manifold_comparison_schematic.png" 1765124903 137730 cd3cea0ae320b59f83031945a493aad3 ""
   "figures/pca_trajectories_schematic.png" 1765124902 113263 ab22673ce9bcf1b0d85930c92894a840 ""
-  "geometric_analysis_ired.aux" 1765125074 4265 f118521624b040100f571e4d86a5101d "pdflatex"
-  "geometric_analysis_ired.out" 1765125074 2676 2f9f96f79c84e0c3115171a6fcbdffff "pdflatex"
-  "geometric_analysis_ired.tex" 1765125073 13833 fc572c8e4338ba860ab17c42d159a32b ""
+  "geometric_analysis_ired.aux" 1765227488 4266 97fb828173615eeaa255cd50077397e7 "pdflatex"
+  "geometric_analysis_ired.out" 1765227488 2681 e2b107882d47a39432d83e78da797e7d "pdflatex"
+  "geometric_analysis_ired.tex" 1765227482 12808 425ecd268a9d4ee309f038e51809fe1a ""
   (generated)
   "geometric_analysis_ired.aux"
   "geometric_analysis_ired.log"
